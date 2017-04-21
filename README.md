@@ -1,22 +1,70 @@
-[![GitHub release](https://img.shields.io/github/release/gnuarmeclipse/qemu.svg)](https://github.com/gnuarmeclipse/qemu/releases/latest) [![Github Releases](https://img.shields.io/github/downloads/gnuarmeclipse/qemu/latest/total.svg)](https://github.com/gnuarmeclipse/qemu/releases/latest) [![Github All Releases](https://img.shields.io/github/downloads/gnuarmeclipse/qemu/total.svg)](https://github.com/gnuarmeclipse/qemu/releases/latest)
+# GNU ARM Eclipse QEMU (w/ eChronos patches)
 
-# GNU ARM Eclipse QEMU
+This is a fork of [GNU ARM Eclipse QEMU](http://gnuarmeclipse.github.io/qemu), which is a project intended to provide support for Cortex-M emulation in QEMU.
 
-The [GNU ARM Eclipse QEMU](http://gnuarmeclipse.github.io/qemu) subproject is a fork of [QEMU](http://wiki.qemu.org/Main_Page) (an open source machine emulator), intended to provide support for Cortex-M emulation in GNU ARM Eclipse. The source code is part of the **GNU ARM Eclipse** project, and is available from [GitHub](https://github.com/gnuarmeclipse/qemu). Binary packages are available from [GitHub Releases](https://github.com/gnuarmeclipse/qemu/releases).
+## Installing binary release
 
-## How to use
+(Coming soon...)
 
-* [Overview](http://gnuarmeclipse.github.io/qemu/) (read me first!)
-* [QEMU Install](http://gnuarmeclipse.github.io/qemu/install)
-* Eclipse plug-in
-* [Support](https://github.com/gnuarmeclipse/qemu/issues/1) (using the GitHub Issues)
+## Building
 
-## How to build
+To build a complete release, follow the official GNU ARM Eclipse build instructions.
 
-* [How to build](http://gnuarmeclipse.github.io/qemu/build-procedure) (using Docker containers)
-* [Change log](http://gnuarmeclipse.github.io/qemu/change-log) ([2014](http://gnuarmeclipse.github.io/qemu/change-log/2014))
+To build an executable with a bit less effort, read on.
 
-## Releases & binaries
+### Prerequisites
 
-See the [releases](http://gnuarmeclipse.github.io/qemu/releases) page.
-Binaries for most platforms can be downloaded from [GitHub Releases](https://github.com/gnuarmeclipse/qemu/releases).
+This fork requires the same prerequisites as the GNU ARM Eclipse QEMU fork. However, the build process for the GNU ARM Eclipse QEMU fork is rather involved, and many systems will already have most of the prerequisites. It is for this reason that I recommend attempting to build it using these build instructions and just install prerequisites as the build fails rather than following through the entire docker-image process as would normally be required.
+
+### How to build
+
+First, clone the repository:
+
+```
+git clone https://github.com/echronos/qemu echronos-qemu
+cd echronos-qemu
+```
+
+Now we'll configure the build. Make sure to modify the SDL2 include path below to correspond to the your SDL2 headers. (you'll need both the SDL2 and SDL2_Image packages installed)
+```
+./configure --target-list=gnuarmeclipse-softmmu --extra-cflags="-g -I/usr/include/SDL2/ -I/usr/include/" --disable-werror
+```
+
+We're ready to build it:
+```
+make
+```
+
+Now we will copy the device support files and images to a place where the binary can see them:
+```
+cp gnuarmeclipse/devices/*.json gnuarmeclipse-softmmu
+cp gnuarmeclipse/graphics/*.jpg gnuarmeclipse-softmmu
+```
+
+And we're ready to run binaries. Say we already built an example gatria system for the stm32 (see official eChronos readme):
+```
+cd gnuarmeclipse-softmmu
+./qemu-system-gnuarmeclipse -mcu STM32F407VG -s --kernel <my_echronos_repo>/out/machine-stm32f4-discovery/example/gatria-system/system
+
+....
+task b
+task a
+task b
+b blocking
+task a
+task a
+unblocking b
+task b
+task a
+task b
+task a
+task b
+task a
+task b
+b blocking
+task a
+```
+
+You can also export this directory to your PATH if you would like.
+
+Also note that in the above example we are not using the `-S` option which indicates that we will wait for a debugger to attach to the qemu machine.
