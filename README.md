@@ -8,13 +8,11 @@ This is a fork of [GNU ARM Eclipse QEMU](http://gnuarmeclipse.github.io/qemu), w
 
 ## Building
 
-To build a complete release, follow the official GNU ARM Eclipse build instructions.
-
-To build an executable with a bit less effort, read on.
+To build a binary, read on.
 
 ### Prerequisites
 
-This fork requires the same prerequisites as the GNU ARM Eclipse QEMU fork. However, the build process for the GNU ARM Eclipse QEMU fork is rather involved, and many systems will already have most of the prerequisites. It is for this reason that I recommend attempting to build it using these build instructions and just install prerequisites as the build fails rather than following through the entire docker-image process as would normally be required.
+This fork requires the same prerequisites as the GNU ARM Eclipse QEMU fork. However, the build process for the GNU ARM Eclipse QEMU fork is rather involved, and many systems will already have most of the prerequisites. It is for this reason that I recommend attempting to build it using these build instructions and just install prerequisites as the build fails rather than following through the entire docker-image process as would normally be required (i.e those on the GNU ARM Eclipse QEMU pages).
 
 ### How to build
 
@@ -35,16 +33,21 @@ We're ready to build it:
 make
 ```
 
-Now we will copy the device support files and images to a place where the binary can see them:
+Now copy the device support files and images to a place where the binary can see them:
 ```
 cp gnuarmeclipse/devices/*.json gnuarmeclipse-softmmu
 cp gnuarmeclipse/graphics/*.jpg gnuarmeclipse-softmmu
 ```
 
-And we're ready to run binaries. Say we already built an example gatria system for the stm32 (see official eChronos readme):
+Add our qemu binary to the PATH (you can do this permanently if you want):
 ```
-cd gnuarmeclipse-softmmu
-./qemu-system-gnuarmeclipse -mcu STM32F407VG -s --kernel <my_echronos_repo>/out/machine-stm32f4-discovery/example/gatria-system/system
+export PATH=`pwd`/path:$PATH
+```
+This `path` directory just contains a script that allows you to run `echronos-qemu-system-arm` anywhere on your machine.
+
+And we're ready to run a system. Say we already built an example gatria system for the stm32 (see official eChronos readme):
+```
+echronos-qemu-system-arm -mcu STM32F407VG -s --kernel <my_echronos_repo>/out/machine-stm32f4-discovery/example/gatria-system/system
 
 ....
 task b
@@ -64,7 +67,5 @@ task b
 b blocking
 task a
 ```
-
-You can also export this directory to your PATH if you would like.
 
 Also note that in the above example we are not using the `-S` option which indicates that we will wait for a debugger to attach to the qemu machine.
