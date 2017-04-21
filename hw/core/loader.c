@@ -1110,11 +1110,20 @@ int rom_check_and_register_reset(void)
         if (rom->fw_file) {
             continue;
         }
-        if ((addr > rom->addr) && (as == rom->as)) {
+
+        /* With our current linker script this check caused a false
+         * positive error message, see bug report at:
+         * https://bugs.launchpad.net/qemu/+bug/1429841
+         * Fixed not detecting NOBITS sections by making sure datasize > 0
+         * before spitting out this error */
+
+        if ((addr > rom->addr) && (as == rom->as) && rom->datasize > 0) {
+
             fprintf(stderr, "rom: requested regions overlap "
                     "(rom %s. free=0x" TARGET_FMT_plx
                     ", addr=0x" TARGET_FMT_plx ")\n",
                     rom->name, addr, rom->addr);
+
             return -1;
         }
         addr  = rom->addr;
