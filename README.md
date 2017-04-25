@@ -2,9 +2,13 @@
 
 This is a fork of [GNU ARM Eclipse QEMU](http://gnuarmeclipse.github.io/qemu), which is a project intended to provide support for Cortex-M emulation in QEMU.
 
-## Using the binaries
+## Using the binaries (Tested on Ubuntu 14.04)
 
-First, clone the repository and switch to the correct branch:
+First, grab the dependencies you'll need:
+```
+sudo apt-get install libfdt-dev libsdl2-image-2.0-0 libsdl2-2.0-0
+```
+Clone the repository and switch to the correct branch:
 
 ```
 git clone https://github.com/echronos/qemu echronos-qemu
@@ -17,7 +21,7 @@ export PATH=`pwd`/path:$PATH
 ```
 This `path` directory just contains a script that allows you to run `echronos-qemu-system-arm` anywhere on your machine.
 
-Note, when you load a kernel with this qemu, that the path to our kernel MUST be absolute as the qemu binary must be run with the CWD in it's binary folder. If you are in the eChronos repo, this means you will want to prefix `elf` files with ```pwd`/out/...``.
+Note, when you load a kernel with this qemu, that the path to our kernel MUST be absolute as the qemu binary must be run with the CWD in it's binary folder. If you are in the eChronos repo, this means you will want to prefix `elf` files with `` `pwd`/out/... ``.
 
 We're ready to run a system! Say we already built an example gatria system for the stm32 (see official eChronos readme):
 ```
