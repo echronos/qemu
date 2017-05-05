@@ -8,6 +8,9 @@ First, grab the dependencies you'll need:
 ```
 sudo apt-get install libfdt-dev libsdl2-image-2.0-0 libsdl2-2.0-0
 ```
+
+Note that you'll need to be on a system that has a GUI (i.e not a default Ubuntu Server installation), due to the libsdl dependency requiring a context on qemu startup.
+
 Clone the repository and switch to the correct branch:
 
 ```
