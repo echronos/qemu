@@ -1350,14 +1350,14 @@ static void stm32f4_usart_dr_post_write_callback(Object *reg, Object *periph,
         peripheral_register_t value, peripheral_register_t full_value)
 {
     STM32USARTState *state = STM32_USART_STATE(periph);
-    unsigned char ch;
+    //unsigned char ch;
 
     int32_t cr1 = peripheral_register_get_raw_value(state->reg.cr1);
 
     // 'value' may be half-word, use full_word.
     if ((cr1 & USART_CR1_UE) && (cr1 & USART_CR1_TE)) {
         if (state->chr) {
-            ch = full_value; /* Use only the lower 8 bits */
+            //ch = full_value; /* Use only the lower 8 bits */
 #if 0
             qemu_chr_fe_write_all(state->chr, &ch, 1);
 #endif
