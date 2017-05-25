@@ -40,7 +40,10 @@
 #include "qemu/thread.h"
 #include "qemu/log.h"
 
+#if defined(CONFIG_SDL)
 #include <SDL.h>
+#endif
+
 int qemu_main(int argc, char **argv, char **envp);
 
 #include <hw/cortexm/graphic.h>

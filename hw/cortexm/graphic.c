@@ -54,10 +54,13 @@ static void cortexm_graphic_process_mouse_button_up(void);
 
 static bool is_not_nographic = false;
 static bool is_terminated = false;
+
+#if defined(CONFIG_SDL)
 static SDL_Cursor *saved_cursor = NULL;
 static SDL_Cursor *button_cursor = NULL;
 static ButtonState *current_button = NULL;
 static ButtonState *pushed_button = NULL;
+#endif
 
 // ----------------------------------------------------------------------------
 
@@ -68,6 +71,7 @@ typedef struct {
 
 static BoardGraphicContext *board_graphic_context;
 
+#if defined(CONFIG_SDL)
 static void cortexm_graphic_process_event(SDL_Event* event)
 {
     GPIOLEDState *state;
@@ -188,6 +192,7 @@ static void cortexm_graphic_process_event(SDL_Event* event)
         break;
     }
 }
+#endif
 
 #if defined(USE_GRAPHIC_POLL_EVENT)
 static QEMUTimer *event_loop_timer;
@@ -278,6 +283,7 @@ int cortexm_graphic_enqueue_event(int code, void *data1, void *data2)
 static inline bool cortexm_graphic_mouse_is_in_button(MousePosition *mp,
         ButtonState *button_state)
 {
+    #if defined(CONFIG_SDL)
     if ((mp->x >= button_state->position.x_left)
             && (mp->x <= button_state->position.x_right)
             && (mp->y >= button_state->position.y_top)
@@ -286,10 +292,14 @@ static inline bool cortexm_graphic_mouse_is_in_button(MousePosition *mp,
     } else {
         return false;
     }
+    #else
+    return false;
+    #endif
 }
 
 static void cortexm_graphic_process_mouse_motion(void)
 {
+    #if defined(CONFIG_SDL)
     MousePosition mp;
     int i;
 
@@ -319,15 +329,15 @@ static void cortexm_graphic_process_mouse_motion(void)
             saved_cursor = NULL;
         }
     }
+    #endif
 }
 
 static void cortexm_graphic_process_mouse_button_down(void)
 {
-#if 1
+    #if defined(CONFIG_SDL)
     MousePosition mp;
     SDL_GetMouseState(&mp.x, &mp.y);
     qemu_log_mask(LOG_FUNC, "%s() %d,%d\n", __FUNCTION__, mp.x, mp.y);
-#endif
 
     if (current_button != NULL) {
 
@@ -337,10 +347,12 @@ static void cortexm_graphic_process_mouse_button_down(void)
         klass->down(current_button);
         pushed_button = current_button;
     }
+    #endif
 }
 
 static void cortexm_graphic_process_mouse_button_up(void)
 {
+    #if defined(CONFIG_SDL)
     if (pushed_button != NULL) {
 
         ButtonClass *klass = BUTTON_GET_CLASS(pushed_button);
@@ -349,6 +361,7 @@ static void cortexm_graphic_process_mouse_button_up(void)
         klass->up(pushed_button);
         pushed_button = NULL;
     }
+    #endif
 }
 
 // ----------------------------------------------------------------------------
@@ -428,7 +441,9 @@ static void cortexm_graphic_atexit(void)
 
         while (!is_terminated) {
             qemu_log_mask(LOG_FUNC, "%s() wait\n", __FUNCTION__);
+    #if defined(CONFIG_SDL)
             SDL_Delay(100);
+    #endif
         }
     }
 }
@@ -492,7 +507,11 @@ void cortexm_graphic_board_clear_graphic_context(
 bool cortexm_graphic_board_is_graphic_context_initialised(
         BoardGraphicContext *board_graphic_context)
 {
+    #if defined(CONFIG_SDL)
     return (board_graphic_context->surface != NULL);
+    #else
+    return false;
+    #endif
 }
 
 static void cortexm_graphic_board_init_graphic_context(
@@ -631,14 +650,20 @@ void cortexm_graphic_led_clear_graphic_context(
 {
     qemu_log_function_name();
 
+#if defined(CONFIG_SDL)
     led_graphic_context->crop_on = NULL;
     led_graphic_context->crop_off = NULL;
+#endif
 }
 
 bool cortexm_graphic_led_is_graphic_context_initialised(
         LEDGraphicContext *led_graphic_context)
 {
+#if defined(CONFIG_SDL)
     return (led_graphic_context->crop_on != NULL);
+#else
+    return false;
+#endif
 }
 
 static void cortexm_graphic_led_init_graphic_context(
